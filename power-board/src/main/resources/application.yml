@@ -1,0 +1,54 @@
+debug: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    anpopo.powerboard: debug
+    org.springframwork.web.servlet: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+spring:
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/board
+      password: 1234
+      username: anpopo
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: always
+
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: testdb
+#  datasource:
+#    hikari:
+#      jdbc-url: jdbc:h2:mem:board;mode=mysql
+#      username: sa
+#      password:
+#      driver-class-name: org.h2.Driver
+#  sql:
+#    init:
+#      mode: always
+#  test.
