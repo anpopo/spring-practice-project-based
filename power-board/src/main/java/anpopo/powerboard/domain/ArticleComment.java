@@ -1,6 +1,5 @@
 package anpopo.powerboard.domain;
 
-import anpopo.powerboard.config.JpaConfig;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,41 +9,31 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 @Table(indexes = {
-        @Index(columnList = "title"),
-        @Index(columnList = "hashtag"),
+        @Index(columnList = "content"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy"),
 })
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Article {
-
+public class ArticleComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long articleId;
+    private Long articleCommentId;
 
     @Setter
-    @Column(nullable = false)
-    private String title;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "articleId")
+    private Article article;
 
     @Setter
-    @Column(nullable = false, length = 10000)
+    @Column(length = 500)
     private String content;
-
-    @Setter
-    @Column
-    private String hashtag;
-
-    @OrderBy("articleCommentId")
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
     @CreatedDate
     @Column(nullable = false)
@@ -62,29 +51,24 @@ public class Article {
     @Column(nullable = false, length = 100)
     private String modifiedBy;
 
-    private Article(String title, String content, String hashtag) {
-        this.title = title;
+    private ArticleComment(Article article, String content) {
+        this.article = article;
         this.content = content;
-        this.hashtag = hashtag;
     }
 
-    public static Article of(String title, String content, String hashtag) {
-        return new Article(title, content, hashtag);
+    public static ArticleComment of(Article article, String content) {
+        return new ArticleComment(article, content);
     }
 
-    /**
-     * - 영속화 되지 않은 엔티티는 전부 다른 값으로 본다.
-     * - 자바 14부터 도입된 패턴 변수 -> article 키워드 사용
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Article article)) return false;
-        return articleId != null && articleId.equals(article.articleId);
+        if (!(o instanceof ArticleComment articleComment)) return false;
+        return articleCommentId != null && articleCommentId.equals(articleComment.articleCommentId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(articleId);
+        return Objects.hash(articleCommentId);
     }
 }
