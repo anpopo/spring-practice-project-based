@@ -33,7 +33,12 @@ spring:
       enabled: true
   sql:
     init:
-      mode: always
+      mode: never
+
+  data:
+    rest:
+      base-path: /api
+      detection-strategy: annotated
 
 
 ---
@@ -54,3 +59,4 @@ spring:
   test:
     database:
       replace: none
+
