@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-@Disabled("spring data rest 통합 테스트는 불필요")
 @DisplayName("data rest library api 테스트")
 @AutoConfigureMockMvc
 @Transactional
@@ -22,7 +21,7 @@ public class DataRestTest {
     @Autowired
     private MockMvc mvc;
 
-
+    @Disabled("spring data rest 통합 테스트는 불필요")
     @DisplayName("[api] 게시글  리스트 조회")
     @Test
     void givenNothing_whenRequestingArticles_thenReturnsArticlesList() throws Exception {
@@ -32,6 +31,7 @@ public class DataRestTest {
 //                .andDo(MockMvcResultHandlers.print());
     }
 
+    @Disabled("spring data rest 통합 테스트는 불필요")
     @DisplayName("[api] 게시글 단건 조회")
     @Test
     void givenNothing_whenRequestingArticles_thenReturnsArticle() throws Exception {
@@ -41,6 +41,7 @@ public class DataRestTest {
 //                .andDo(MockMvcResultHandlers.print());
     }
 
+    @Disabled("spring data rest 통합 테스트는 불필요")
     @DisplayName("[api] 게시글 댓글 리스트 조회")
     @Test
     void givenNothing_whenRequestingArticleArticleComment_thenReturnsArticleComments() throws Exception {
@@ -50,6 +51,7 @@ public class DataRestTest {
 //                .andDo(MockMvcResultHandlers.print());
     }
 
+    @Disabled("spring data rest 통합 테스트는 불필요")
     @DisplayName("[api] 게시글 댓글 리스트 조회")
     @Test
     void givenNothing_whenRequestingArticleComments_thenReturnsArticleComments() throws Exception {
@@ -59,6 +61,7 @@ public class DataRestTest {
 //                .andDo(MockMvcResultHandlers.print());
     }
 
+    @Disabled("spring data rest 통합 테스트는 불필요")
     @DisplayName("[api] 게시글 댓글 단건 조회")
     @Test
     void givenNothing_whenRequestingArticleComments_thenReturnsArticleComment() throws Exception {
