@@ -21,9 +21,8 @@ import java.util.*;
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy"),
 })
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Article {
+public class Article extends AuditingFields{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,21 +45,6 @@ public class Article {
     @ToString.Exclude
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @CreatedBy
-    @Column(nullable = false, length = 100)
-    private String createdBy;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime modifiedAt;
-
-    @LastModifiedBy
-    @Column(nullable = false, length = 100)
-    private String modifiedBy;
 
     private Article(String title, String content, String hashtag) {
         this.title = title;
@@ -74,7 +58,7 @@ public class Article {
 
     /**
      * - 영속화 되지 않은 엔티티는 전부 다른 값으로 본다.
-     * - 자바 14부터 도입된 패턴 변수 -> article 키워드 사용
+     * - 자바 14부터 도입된 패턴 변수
      */
     @Override
     public boolean equals(Object o) {
