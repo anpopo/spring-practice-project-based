@@ -1,8 +1,6 @@
 package anpopo.powerboard.repository;
 
-import anpopo.powerboard.domain.Article;
 import anpopo.powerboard.domain.ArticleComment;
-import anpopo.powerboard.domain.QArticle;
 import anpopo.powerboard.domain.QArticleComment;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
@@ -26,4 +24,7 @@ public interface ArticleCommentRepository extends
         bindings.bind(root.createdAt).first(DateTimeExpression::eq);
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
+
+    ArticleComment findByArticleArticleId(Long articleId);
+
 }
