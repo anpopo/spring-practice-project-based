@@ -2,6 +2,7 @@ package anpopo.powerboard.repository;
 
 import anpopo.powerboard.config.JpaConfig;
 import anpopo.powerboard.domain.Article;
+import anpopo.powerboard.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ class JpaRepositoryTest {
     void given_whenInserting_then() {
         // given
         long previousCount = articleRepository.count();
-        Article newArticle = Article.of("new", "new content", "spring board");
+        Article newArticle = createArticle();
 
         // when
         Article savedArticle = articleRepository.save(newArticle);
@@ -85,5 +86,13 @@ class JpaRepositoryTest {
         // then
         assertThat(articleRepository.count()).isEqualTo(previousCount - 1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousArticleComment - commentSize);
+    }
+
+    private Article createArticle() {
+        return Article.of(null, "new title", "new content", "spring board");
+    }
+
+    private UserAccount createUserAccount() {
+        return UserAccount.of("anpopo", "1234", "anpopo0108@gamil.com", "anpopo", null);
     }
 }

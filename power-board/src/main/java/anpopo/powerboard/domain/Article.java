@@ -9,7 +9,7 @@ import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -17,7 +17,7 @@ import java.util.Set;
         @Index(columnList = "createdBy"),
 })
 @Entity
-public class Article extends AuditingFields{
+public class Article extends AuditingFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,20 +35,23 @@ public class Article extends AuditingFields{
     @Column
     private String hashtag;
 
-    @OrderBy("articleCommentId")
+    @OrderBy(" createdAt desc ")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UserAccount userAccount;
 
-    private Article(String title, String content, String hashtag) {
+    private Article(UserAccount userAccount, String title,String content,String hashtag) {
+        this.userAccount = userAccount;
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
 
-    public static Article of(String title, String content, String hashtag) {
-        return new Article(title, content, hashtag);
+    public static Article of(UserAccount userAccount, String title, String content, String hashtag) {
+        return new Article(userAccount, title, content, hashtag);
     }
 
     /**
@@ -65,5 +68,15 @@ public class Article extends AuditingFields{
     @Override
     public int hashCode() {
         return Objects.hash(articleId);
+    }
+
+    public void updateArticle(String title, String content, String hashtag) {
+        this.title = title;
+        this.content = content;
+        this.hashtag = hashtag;
+    }
+
+    public void addArticleComment(ArticleComment articleComment) {
+        this.articleComments.add(articleComment);
     }
 }

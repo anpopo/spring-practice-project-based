@@ -3,13 +3,17 @@ package anpopo.powerboard.dto;
 import java.time.LocalDateTime;
 
 public record ArticleCommentDto(
-    Long articleCommentId,
-    String content,
-    LocalDateTime modifiedAt,
-    String modifiedBy
+        Long articleId,
+        Long articleCommentId,
+        UserAccountDto userAccountDto,
+        String content,
+        LocalDateTime createdAt,
+        String createdBy,
+        LocalDateTime modifiedAt,
+        String modifiedBy
 ) {
 
-    public static ArticleCommentDto of(Long articleCommentId, String content, LocalDateTime modifiedAt, String modifiedBy) {
-        return new ArticleCommentDto(articleCommentId, content, modifiedAt, modifiedBy);
+    public static ArticleCommentDto of(Long articleId, Long articleCommentId, UserAccountDto userAccountDto, String content, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+        return new ArticleCommentDto(articleId, articleCommentId, userAccountDto, content, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 }
