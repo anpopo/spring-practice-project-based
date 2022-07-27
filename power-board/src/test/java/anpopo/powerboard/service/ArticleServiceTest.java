@@ -2,6 +2,7 @@ package anpopo.powerboard.service;
 
 import anpopo.powerboard.domain.Article;
 import anpopo.powerboard.domain.UserAccount;
+import anpopo.powerboard.domain.enumeration.SearchType;
 import anpopo.powerboard.dto.ArticleDto;
 import anpopo.powerboard.repository.ArticleRepository;
 import org.assertj.core.api.Assertions;
@@ -12,7 +13,10 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -32,47 +36,83 @@ class ArticleServiceTest {
     /**
      * 검색, 게시글 페이지 이동, 페이징, 홈버튼 게시판 리다이렉션, 정렬
      */
-//
-//    @DisplayName("[비지니스] 게시글 검색")
-//    @Test
-//    void searchArticles() {
-//        // when
-//        Page<ArticleDto> articles = sut.searchArticles(SearchType.TITLE , "keyword");  // 제목 본문 id 닉네임 해시태그
-//
-//        // then
-//        Assertions.assertThat(articles).isNotNull();
-//    }
-//
-//    @DisplayName("[비지니스] 게시글 조회")
-//    @Test
-//    void getArticle() {
-//        // when
-//        ArticleDto article = sut.getArticle(1L);  // 제목 본문 id 닉네임 해시태그
-//
-//        // then
-//        Assertions.assertThat(article).isNotNull();
-//    }
 
-//
-//    @DisplayName("[비지니스] 게시글 생성")
-//    @Test
-//    void createArticleTest() {
-//        // given
-//        ArticleDto dto = createArticleDto();
-//        Article article = createArticle();
-//
-//        BDDMockito.given(articleRepository.save(any(Article.class)))
-//                .willReturn(article);
-//
-//        // when
-//        sut.saveArticle(dto);
-//
-//        // then
-//        Article savedArticle = BDDMockito.then(articleRepository).should().save(any(Article.class));
-//
-//        Assertions.assertThat(savedArticle.getTitle()).isEqualTo(article.getTitle());
-//
-//    }
+    @DisplayName("[비지니스] 게시글 검색")
+    @Test
+    void searchArticles() {
+        // given
+        Pageable pageable = Pageable.ofSize(20);
+
+        BDDMockito.given(articleRepository.findAll(pageable))
+                .willReturn(Page.empty());
+
+        // when
+        Page<ArticleDto> articles = sut.searchArticles(null, null, pageable);  // 제목 본문 id 닉네임 해시태그
+
+        // then
+        Assertions.assertThat(articles)
+                .isNotNull()
+                .isEmpty();
+
+        BDDMockito.then(articleRepository).should().findAll(pageable);
+    }
+
+    @DisplayName("[비지니스] 게시글 조회")
+    @Test
+    void getArticle() {
+
+        // given
+        Article article = createArticle();
+
+        BDDMockito.given(articleRepository.findByArticleId(anyLong()))
+                .willReturn(Optional.of(article));
+
+        // when
+        ArticleDto actual = sut.getArticle(1L);  // 제목 본문 id 닉네임 해시태그
+
+        // then
+        Assertions.assertThat(actual).isNotNull();
+        Assertions.assertThat(actual)
+                .hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+
+        BDDMockito.then(articleRepository).should().findByArticleId(anyLong());
+    }
+
+    @DisplayName("[비지니스] 존재하지 않는 게시글 조회시 예외 처리")
+    @Test
+    void notFoundArticle() {
+
+        // when && then
+        Assertions.assertThatThrownBy(() -> sut.getArticle(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("게시글을 찾을 수 없습니다.");
+
+        BDDMockito.then(articleRepository).should().findByArticleId(anyLong());
+    }
+
+
+    @DisplayName("[비지니스] 게시글 생성")
+    @Test
+    void createArticleTest() {
+        // given
+        ArticleDto dto = createArticleDto();
+        Article article = createArticle();
+
+        BDDMockito.given(articleRepository.save(any(Article.class))).willReturn(article);
+
+        // when
+        ArticleDto articleDto = sut.saveArticle(dto);
+
+        // then
+        BDDMockito.then(articleRepository).should().save(any(Article.class));
+
+        Assertions.assertThat(articleDto)
+                .hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+    }
 
     @DisplayName("[비지니스] 게시글 수정")
     @Test
@@ -81,32 +121,41 @@ class ArticleServiceTest {
         ArticleDto dto = createUpdateArticleDto();
         Article article = createArticle();
 
-
-        BDDMockito.given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
+        BDDMockito.given(articleRepository.findByArticleId(anyLong())).willReturn(Optional.of(article));
 
         // when
         Article updatedArticle = sut.updateArticle(dto);
 
         // then
-
         Assertions.assertThat(updatedArticle.getTitle()).isEqualTo(dto.title());
+        BDDMockito.then(articleRepository).should().findByArticleId(anyLong());
+    }
+
+    @DisplayName("[비지니스] 없는 게시글 수정 요청 시 예외 처리")
+    @Test
+    void articleNotFoundNotUpdate() {
+        // given
+        ArticleDto dto = createUpdateArticleDto();
+
+        // when &&  then
+        Assertions.assertThatThrownBy(() -> sut.updateArticle(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("게시글을 찾을 수 없습니다.");
+
+        BDDMockito.then(articleRepository).should().findByArticleId(anyLong());
     }
 
     @DisplayName("[비지니스] 게시글 삭제")
     @Test
     void deleteArticle() {
-
-        Article article = createArticle();
-        BDDMockito.willDoNothing().given(articleRepository).delete(any(Article.class));
-        BDDMockito.given(articleRepository.findById(anyLong()))
-                .willReturn(Optional.of(article));
-
+        // given
+        BDDMockito.willDoNothing().given(articleRepository).deleteById(anyLong());
 
         // when
         sut.deleteArticle(1L);
 
         // then
-        BDDMockito.then(articleRepository).should().delete(any(Article.class));
+        BDDMockito.then(articleRepository).should().deleteById(anyLong());
     }
 
     private ArticleDto createArticleDto() {

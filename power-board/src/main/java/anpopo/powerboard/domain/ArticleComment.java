@@ -54,4 +54,8 @@ public class ArticleComment extends AuditingFields {
     public int hashCode() {
         return Objects.hash(articleCommentId);
     }
+
+    public void updateCommentContent(String content) {
+        this.content = content;
+    }
 }

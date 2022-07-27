@@ -11,6 +11,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource
 public interface ArticleCommentRepository extends
@@ -28,5 +29,7 @@ public interface ArticleCommentRepository extends
     }
 
     List<ArticleComment> findByArticleArticleId(Long articleId);
+
+    Optional<ArticleComment> findByArticleCommentId(Long articleCommentId);
 
 }

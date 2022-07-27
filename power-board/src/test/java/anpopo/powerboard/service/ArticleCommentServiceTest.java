@@ -11,13 +11,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Slice;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -85,24 +84,52 @@ class ArticleCommentServiceTest {
     @Test
     void notFoundArticleNotSaveComment() {
         // given
-        // when
-        // then
+        ArticleCommentDto dto = createArticleCommentDto("떡갈비는 맛있어~");
+
+
+        // when && then
+        Assertions.assertThatThrownBy(() -> sut.saveArticleComment(dto))
+                .isInstanceOf(EntityNotFoundException.class);
+
+        BDDMockito.then(articleRepository).should().findByArticleId(dto.articleId());
+        BDDMockito.then(articleCommentRepository).shouldHaveNoInteractions();
+
     }
 
     @DisplayName("[비지니스] 댓글 수정")
     @Test
     void updateArticleComment() {
         // given
+        String oldContent = "old content";
+        String updatedContent = "updated content";
+
+        ArticleComment articleComment = createArticleComment(oldContent);
+        ArticleCommentDto dto = createArticleCommentDto(updatedContent);
+        BDDMockito.given(articleCommentRepository.findByArticleCommentId(anyLong()))
+                .willReturn(Optional.of(articleComment));
+
         // when
+        sut.updateArticleComment(dto);
+
         // then
+        BDDMockito.then(articleCommentRepository).should().findByArticleCommentId(dto.articleCommentId());
+        Assertions.assertThat(articleComment.getContent())
+                .isNotEqualTo(oldContent)
+                .isEqualTo(updatedContent);
     }
 
     @DisplayName("[비지니스] 댓글이 없는 경우 해당 댓글 수정 안함")
     @Test
     void notFoundArticleCommentNotSave() {
         // given
-        // when
-        // then
+        ArticleCommentDto dto = createArticleCommentDto("인문 고전에 빠져보자");
+
+        // when && then
+        Assertions.assertThatThrownBy(() -> sut.updateArticleComment(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("댓글을 찾을 수 없습니다.");
+
+        BDDMockito.then(articleCommentRepository).should().findByArticleCommentId(anyLong());
     }
 
     @DisplayName("[비지니스] 게시글 댓글 삭제")
