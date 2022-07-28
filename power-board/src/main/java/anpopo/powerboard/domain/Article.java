@@ -40,7 +40,7 @@ public class Article extends AuditingFields {
     @ToString.Exclude
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private UserAccount userAccount;
 
     private Article(UserAccount userAccount, String title,String content,String hashtag) {
@@ -71,9 +71,9 @@ public class Article extends AuditingFields {
     }
 
     public void updateArticle(String title, String content, String hashtag) {
-        this.title = title;
-        this.content = content;
-        this.hashtag = hashtag;
+        this.title = Objects.requireNonNull(title, () -> this.title);
+        this.content = Objects.requireNonNull(content, () -> this.content);;
+        this.hashtag = Objects.requireNonNull(hashtag, () -> this.hashtag);;
     }
 
     public void addArticleComment(ArticleComment articleComment) {

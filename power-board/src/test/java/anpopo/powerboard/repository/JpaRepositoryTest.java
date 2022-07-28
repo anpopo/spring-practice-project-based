@@ -89,7 +89,7 @@ class JpaRepositoryTest {
     }
 
     private Article createArticle() {
-        return Article.of(null, "new title", "new content", "spring board");
+        return Article.of(createUserAccount(), "new title", "new content", "spring board");
     }
 
     private UserAccount createUserAccount() {
